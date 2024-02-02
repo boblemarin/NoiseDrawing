@@ -1,19 +1,12 @@
 /*
 
-OK §- REQUIREMENTS :
+REQUIREMENTS :
   - Brave (kiosk mode)
   - Node.js for server
   - LoopMIDI
   - Ableton Live (or granular synth)
 
 TODO :
-OK - update draw method to avoid a too long stroke list
-  OK - draw in temp canvas
-  OK - onPointerUp, copy temp canvas into canvas and empty history
-  OK - only keep bitmap version of the result
-
-OK - setup server to receive png drawings and save them in folder
-  OK - check enfantrisme project for server and send code
 
 - MIDI
   OK - add MIDI.js
@@ -26,18 +19,29 @@ OK - setup server to receive png drawings and save them in folder
   - webcam input
   ? - image load
 
+- create scene in Ableton
+
+- automate Brave launch in Kiosk mode to avoid the FS close button appearing on top of the screen
+
 OK - setup shortcut keys on tablet to have different functions
   OK - (save &) clear
   NON - undo ? (not with new drawing method)
   - max pen size
   OK - color ?
 
-- create scene in Ableton
+OK - update draw method to avoid a too long stroke list
+  OK - draw in temp canvas
+  OK - onPointerUp, copy temp canvas into canvas and empty history
+  OK - only keep bitmap version of the result
 
-- automate Brave launch in Kiosk mode to avoid the FS close button appearing on top of the screen
+OK - setup server to receive png drawings and save them in folder
+  OK - check enfantrisme project for server and send code
 
-OK - COLOR PALETTES !
-https://coolors.co/palette/003049-d62828-f77f00-fcbf49-eae2b7
+OK - COLOR PALETTES ! 
+  OK - import palettes from Coolors.co https://coolors.co/
+  OK - random palette on start
+  OK - use buttons to choose pen color
+  OK - add button to fill background
 
 */
 
@@ -77,8 +81,6 @@ let cv = document.getElementById('drawCanvas'),
     indicator = document.querySelector('.indicator'),
     isListeningForInput = false,
     currentStroke = [],
-    //strokes = [],
-    //redoStrokes = [],
     width = window.innerWidth,
     height = window.innerHeight,
     dirty = false,
@@ -88,7 +90,6 @@ let cv = document.getElementById('drawCanvas'),
     saved = false,
     currentPalette,
     currentColor = 0,
-    lineColor = "black",
     fillIndex = 0;
 
 
@@ -143,6 +144,8 @@ function onPointerDown(event) {
   isListeningForInput = true;
   currentStroke = [[event.pageX, event.pageY, event.pressure]];
   startNoteAt(event.pageX, event.pageY, event.pressure);
+  let s = 1 - event.pressure * 0.5;
+  indicator.style.transform = 'translate3d('+event.pageX+'px,'+event.pageY+'px,0) scale3d('+s+','+s+',1)';
   indicator.style.display = 'block';
 }
 
