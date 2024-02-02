@@ -1,0 +1,137 @@
+html { box-sizing: border-box; }
+*, *:before, *:after { box-sizing: inherit; }
+
+html, body { height: 100%; }
+
+body {
+  background-color: #fff;
+  margin: 0;
+  color: black;
+  font-family: Helvetica;
+  overflow: hidden;
+  cursor: crosshair;
+  /*cursor: none;*/
+  touch-action: none;
+}
+
+.fs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  touch-action: none;
+}
+
+#sourceDiv {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  bottom: 10px;
+  pointer-events: none;
+  touch-action: none;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.indicator {
+  position: absolute;
+  top: -24px;
+  left: -24px;
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(0,0,0,0.6);
+  border-radius: 50%;
+  /*transition: transform 0.1s ease-out;*/
+}
+
+.palette {
+  position: absolute;
+  left: -6px;
+  width: 12px;
+  top: 50%;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  touch-action: none;
+}
+
+.palette span {
+  display: block;
+  position: relative;
+  left: 0;
+  margin: 0;
+  padding:0;
+  width: 100%;
+  height: 10vh;
+  background-color: white;
+  pointer-events: none;
+  touch-action: none;
+  border-radius: 0 6px 6px 0;
+}
+
+.palette span.current {
+  left: 6px;
+}
+
+.menu {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  /*width: 42px;*/
+  visibility: hidden;
+}
+
+body.show-menu .menu {
+  visibility: visible;
+}
+
+.menu-item {
+  width: 42px;
+  height: 42px;
+  margin-bottom: 4px;
+  background-color: white;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  border-radius: 50% 50%;
+  border: 4px solid #777;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  border: 4px solid black;
+}
+.menu-separator {
+  width: 42px;
+  height: 84px;
+}
+.menu-black {
+  background-color: black;
+}
+.menu-white {
+  background-color: white;
+}
+.menu-new {
+  background-image: url(menu-new.png);
+}
+.menu-save {
+  background-image: url(menu-save.png);
+}
+.menu-preview {
+  background-image: url(menu-preview.png);
+}
+.menu-undo {
+  background-image: url(menu-undo.png);
+}
+
+.invisible {
+  display: none;
+}
