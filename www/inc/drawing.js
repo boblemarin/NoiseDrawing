@@ -93,6 +93,15 @@ let cv = document.getElementById('drawCanvas'),
     fillIndex = 0;
 
 
+let midiChannel = 1,
+    midiXCC = 24,
+    midiYCC = 32,
+    midiPCC = 48,
+    lastX = -1,
+    lastY = -1,
+    lastP = -1,
+    lastNote = -1;
+
 /* *******************************************************************************
 
                               SET-UP & LISTENERS 
@@ -116,8 +125,9 @@ window.addEventListener('resize', function(e) {
   cv.width = tcv.width = width;
   cv.height = tcv.height = height;
 });
-
-
+document.querySelector('#send-x-btn').addEventListener('mousedown', onMenuSendXCC);
+document.querySelector('#send-y-btn').addEventListener('mousedown', onMenuSendYCC);
+document.querySelector('#send-p-btn').addEventListener('mousedown', onMenuSendPressureCC);
 
 document.addEventListener('pointerdown',   onPointerDown);
 document.addEventListener('pointermove',   onPointerMove);
@@ -272,7 +282,7 @@ function draw() {
    ******************************************************************************* */
 
 function startNoteAt(x,y,pressure) {
-  MIDI.noteOn( 1, 48, 100 )
+  MIDI.noteOn( midiChannel, 48, 100 )
 }
 
 function keepNoteAt(x,y,pressure) {
@@ -280,12 +290,20 @@ function keepNoteAt(x,y,pressure) {
 }
 
 function killNoteAt(x,y) {
-  MIDI.noteOff( 1, 48 )
+  MIDI.noteOff( midiChannel, 48 )
 }
 
+function getValueForX(x) {
+  return x / width * 128 >> 0
+}
 
+function getValueForY(x) {
+  return x / height * 128 >> 0
+}
 
-
+function getValueForPressure(x) {
+  return x * 127 >> 0
+}
 
 
 /* *******************************************************************************
@@ -324,7 +342,22 @@ function onMenuMouseDown(event) {
   event.stopImmediatePropagation();
 }
 
+function onMenuSendXCC(event) {
+  MIDI.noteOn(midiChannel, 36, 60);
+  MIDI.noteOff(midiChannel, 36);
+}
 
+function onMenuSendXCC(event) {
+  MIDI.cc(midiChannel, midiXCC, 64);
+}
+
+function onMenuSendYCC(event) {
+  MIDI.cc(midiChannel, midiYCC, 64);
+}
+
+function onMenuSendPressureCC(event) {
+  MIDI.cc(midiChannel, midiPCC, 64);
+}
 
 /* *******************************************************************************
 
