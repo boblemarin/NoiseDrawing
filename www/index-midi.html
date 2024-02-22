@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <style type="text/css">
+    body, html {
+      height: 100%;
+    }
+    body {
+      overflow: hidden;
+      margin: 0;
+    }
+
+  </style>
+</head>
+<body>
+  <h1> OSC Testing</h1>
+  <script type="text/javascript" src="osc.min.js"></script>
+  <script type="text/javascript">
+    var osc = new OSC();
+    osc.open(); // connect by default to ws://localhost:8080
+
+  /*  document.getElementById('send').addEventListener('click', function() {
+      var message = new OSC.Message('/noise/pos-x', Math.random());
+      osc.send(message);
+    });*/
+
+    
+    document.body.addEventListener('mousedown',onMouseDown);
+    document.body.addEventListener('mousemove',onMouseMove);
+    document.body.addEventListener('mouseup',onMouseUp);
+
+    let isMouseDown = false;
+    let width, height;
+    onResize();
+
+    function onResize(event) {
+      width = window.innerWidth;
+      height = window.innerHeight;
+    }
+
+    function onMouseDown(event) {
+      if (isMouseDown) return;
+      isMouseDown = true;
+
+      osc.send(new OSC.Message('/noise/active', 1));
+      osc.send(new OSC.Message('/noise/posx', event.pageX / width));
+      osc.send(new OSC.Message('/noise/posy', 1 - event.pageY / height));
+      osc.send(new OSC.Message('/noise/pressure', 0.4));
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+
+    function onMouseMove(event) {
+      if (!isMouseDown) return;
+
+      osc.send(new OSC.Message('/noise/posx', event.pageX / width));
+      osc.send(new OSC.Message('/noise/posy', 1 - event.pageY / height));
+      osc.send(new OSC.Message('/noise/pressure', 0.7));
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+    function onMouseUp(event) {
+      if (!isMouseDown) return;
+      isMouseDown = false;
+
+      osc.send(new OSC.Message('/noise/active', 0));
+      osc.send(new OSC.Message('/noise/pressure', 0));
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+
+
+  </script>
+
+</body>
+</html>

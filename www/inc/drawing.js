@@ -93,14 +93,16 @@ let cv = document.getElementById('drawCanvas'),
     fillIndex = 0;
 
 
-let midiChannel = 1,
-    midiXCC = 24,
-    midiYCC = 32,
-    midiPCC = 48,
+let oscPathX = '/noise/posx',
+    oscPathY = '/noise/posy',
+    oscPathP = '/noise/pressure',
+    oscPathActive = '/noise/active'
     lastX = -1,
     lastY = -1,
-    lastP = -1,
-    lastNote = -1;
+    lastP = -1;
+
+var osc = new OSC();
+osc.open(); // connect by default to ws://localhost:8080
 
 /* *******************************************************************************
 
@@ -114,21 +116,24 @@ chooseRandomPalette();
 
 document.querySelector('.menu').addEventListener('mousedown',onMenuMouseDown);
 window.addEventListener('keydown',onKeyDown);
+
 document.addEventListener('contextmenu', function (event) {
   event.preventDefault();
   event.stopImmediatePropagation();
   return false;
 }, false);
+
 window.addEventListener('resize', function(e) {
   width = window.innerWidth;
   height = window.innerHeight;
   cv.width = tcv.width = width;
   cv.height = tcv.height = height;
 });
+/*
 document.querySelector('#send-x-btn').addEventListener('mousedown', onMenuSendXCC);
 document.querySelector('#send-y-btn').addEventListener('mousedown', onMenuSendYCC);
 document.querySelector('#send-p-btn').addEventListener('mousedown', onMenuSendPressureCC);
-
+*/
 document.addEventListener('pointerdown',   onPointerDown);
 document.addEventListener('pointermove',   onPointerMove);
 document.addEventListener('pointerup',     onPointerUp);
@@ -145,24 +150,27 @@ requestAnimationFrame(draw);
 
    ******************************************************************************* */
 
+
 function onPointerDown(event) {
   if (isListeningForInput && currentStroke.length > 1) {
     currentStroke = [];
     dirty = true;
     tdirty = true;
   }
+  //console.log(event);
   isListeningForInput = true;
   currentStroke = [[event.pageX, event.pageY, event.pressure]];
-  startNoteAt(event.pageX, event.pageY, event.pressure);
+  startNoteAt(event);
   let s = 1 - event.pressure * 0.5;
   indicator.style.transform = 'translate3d('+event.pageX+'px,'+event.pageY+'px,0) scale3d('+s+','+s+',1)';
   indicator.style.display = 'block';
 }
 
 function onPointerMove(event) {
+  //console.log(event.altitudeAngle);
   if (isListeningForInput) {
     currentStroke.push([event.pageX, event.pageY, event.pressure]);
-    keepNoteAt(event.pageX, event.pageY, event.pressure);
+    keepNoteAt(event);
     tdirty = true;
     let s = 1 - event.pressure * 0.5;
     indicator.style.transform = 'translate3d('+event.pageX+'px,'+event.pageY+'px,0) scale3d('+s+','+s+',1)';
@@ -172,7 +180,7 @@ function onPointerMove(event) {
 function onPointerUp(event) {
   if (isListeningForInput) {
     isListeningForInput = false;
-    killNoteAt(event.pageX, event.pageY);
+    killNoteAt(event);
     if (currentStroke.length > 1) {
       currentStroke = [];
       dirty = true;
@@ -281,30 +289,50 @@ function draw() {
 
    ******************************************************************************* */
 
-function startNoteAt(x,y,pressure) {
-  MIDI.noteOn( midiChannel, 48, 100 )
+/* 
+event.pageX 
+event.pageY
+event.pressure
+event.altitudeAngle (0-2)
+event.azimuthAngle (0-7)
+*/
+
+function startNoteAt(event) {
+  //MIDI.noteOn( midiChannel, 48, 100 )
+  osc.send(new OSC.Message('/noise/speed', event.altitudeAngle / 2));
+  osc.send(new OSC.Message('/noise/azimuth', event.azimuthAngle / 7));
+  osc.send(new OSC.Message('/noise/active', 1));
+  osc.send(new OSC.Message('/noise/posx', event.pageX / width));
+  osc.send(new OSC.Message('/noise/posy', 1 - event.pageY / height));
+  osc.send(new OSC.Message('/noise/pressure', event.pressure * 0.9999));
 }
 
-function keepNoteAt(x,y,pressure) {
-
+function keepNoteAt(event) {
+  //console.log(pressure);
+  osc.send(new OSC.Message('/noise/speed', event.altitudeAngle / 2));
+  osc.send(new OSC.Message('/noise/azimuth', event.azimuthAngle / 7));
+  osc.send(new OSC.Message('/noise/posx', event.pageX / width));
+  osc.send(new OSC.Message('/noise/posy', 1 - event.pageY / height));
+  osc.send(new OSC.Message('/noise/pressure', event.pressure * 0.9999));
 }
 
-function killNoteAt(x,y) {
-  MIDI.noteOff( midiChannel, 48 )
+function killNoteAt(event) {
+  osc.send(new OSC.Message('/noise/active', 0));
+  osc.send(new OSC.Message('/noise/pressure', 0));
 }
-
+/*
 function getValueForX(x) {
-  return x / width * 128 >> 0
+  return x / width;
 }
 
 function getValueForY(x) {
-  return x / height * 128 >> 0
+  return x / height;
 }
 
 function getValueForPressure(x) {
-  return x * 127 >> 0
+  return x;
 }
-
+*/
 
 /* *******************************************************************************
 

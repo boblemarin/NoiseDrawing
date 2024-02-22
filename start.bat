@@ -1,9 +1,12 @@
 @echo off
 start cmd.exe /k "node index.js"
 
+timeout /t 3
+
 rem ==== Killing any instances of chrome
 taskkill /IM "brave.exe">nul 2>&1
 
+timeout /t 3
 
 rem ==== Set local variables
 
