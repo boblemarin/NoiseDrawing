@@ -1,5 +1,9 @@
+#bespoke savestates
+*.bsk
+
 #saved images
 images/
+
 
 # Logs
 logs
