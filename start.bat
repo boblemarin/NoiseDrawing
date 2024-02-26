@@ -1,12 +1,18 @@
 @echo off
-start cmd.exe /k "node index.js"
+
+start "C:\Program Files\BespokeSynth\BespokeSynth.exe" "NOISE 1.bsk"
 
 timeout /t 3
+
+
+start cmd.exe /k "node index.js"
+
+timeout /t 1
 
 rem ==== Killing any instances of chrome
 taskkill /IM "brave.exe">nul 2>&1
 
-timeout /t 3
+timeout /t 2
 
 rem ==== Set local variables
 
