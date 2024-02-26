@@ -8,7 +8,7 @@ REQUIREMENTS :
 
 TODO :
 
-- MIDI
+OK (switched to OSC)- MIDI
   OK - add MIDI.js
   - send start/stop via Note
   - send positions and pressure via CC 
@@ -18,6 +18,10 @@ TODO :
   OK - midi output selection
   - webcam input
   ? - image load
+
+
+WEBCAM
+
 
 - create scene in Ableton
 
@@ -103,6 +107,13 @@ let oscPathX = '/noise/posx',
 
 var osc = new OSC();
 osc.open(); // connect by default to ws://localhost:8080
+
+let cameraRequested = false,
+    cameraReady = false,
+    cameraShown = false,
+    cameraStream = null,
+    camera_button = document.querySelector("#start-camera"),
+    video = document.querySelector("#video");
 
 /* *******************************************************************************
 
@@ -213,10 +224,10 @@ function onKeyDown(event) {
 
     //TODO: add features here
     case 51:
-      
       break;
+
     case 52:
-      
+      menuShowCamera();
       break;
     case 53:
       
@@ -285,7 +296,7 @@ function draw() {
 
 /* *******************************************************************************
 
-                                        MIDI 
+                                        OSC 
 
    ******************************************************************************* */
 
@@ -298,7 +309,6 @@ event.azimuthAngle (0-7)
 */
 
 function startNoteAt(event) {
-  //MIDI.noteOn( midiChannel, 48, 100 )
   osc.send(new OSC.Message('/noise/speed', event.altitudeAngle / 2));
   osc.send(new OSC.Message('/noise/azimuth', event.azimuthAngle / 7));
   osc.send(new OSC.Message('/noise/active', 1));
@@ -358,6 +368,17 @@ function menuFill() {
   if (--fillIndex < 0) fillIndex = currentPalette.length - 1;
   ctx.fillStyle = currentPalette[fillIndex];
   ctx.fillRect(0,0,width,height);
+}
+
+function menuShowCamera() {
+  /*
+  if(!cameraRequested) {
+    cameraRequested = true;
+    requestCamera();
+  }
+  */
+
+  requestCamera();
 }
 
 function menuChooseColor(col) {
@@ -430,4 +451,24 @@ function parsePalette(paletteString) {
     if (i == 0) s.classList.add('current');
     else s.classList.remove('current');
   }
+}
+
+async function requestCamera() {
+  if (!cameraRequested) {
+    cameraRequested = true;
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: width }, height: { ideal: height } } , audio: false });
+    video.srcObject = cameraStream;
+    cameraReady = true;
+    cameraShown = true;
+  } else {
+    if (cameraShown) {
+      video.srcObject = null; 
+      cameraShown = false;
+    } else {
+      video.srcObject = cameraStream;
+      cameraShown = true;
+    }
+  }
+    
+    //setAppState(1);
 }
