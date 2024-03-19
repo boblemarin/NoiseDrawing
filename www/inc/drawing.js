@@ -1,52 +1,9 @@
 /*
-
 REQUIREMENTS :
   - Brave (kiosk mode)
   - Node.js for server
   - LoopMIDI
   - Ableton Live (or granular synth)
-
-TODO :
-
-OK (switched to OSC)- MIDI
-  OK - add MIDI.js
-  - send start/stop via Note
-  - send positions and pressure via CC 
-
-- TAB key toggles setup menu (for admin)
-  OK - implement TAB toggle
-  OK - midi output selection
-  - webcam input
-  ? - image load
-
-
-WEBCAM
-
-
-- create scene in Ableton
-
-- automate Brave launch in Kiosk mode to avoid the FS close button appearing on top of the screen
-
-OK - setup shortcut keys on tablet to have different functions
-  OK - (save &) clear
-  NON - undo ? (not with new drawing method)
-  - max pen size
-  OK - color ?
-
-OK - update draw method to avoid a too long stroke list
-  OK - draw in temp canvas
-  OK - onPointerUp, copy temp canvas into canvas and empty history
-  OK - only keep bitmap version of the result
-
-OK - setup server to receive png drawings and save them in folder
-  OK - check enfantrisme project for server and send code
-
-OK - COLOR PALETTES ! 
-  OK - import palettes from Coolors.co https://coolors.co/
-  OK - random palette on start
-  OK - use buttons to choose pen color
-  OK - add button to fill background
-
 */
 
 const palettes = [ 
@@ -113,6 +70,8 @@ let cameraRequested = false,
     cameraReady = false,
     cameraShown = false,
     cameraStream = null,
+    videoCounter = 0;
+    videoAmount = 5;
     camera_button = document.querySelector("#start-camera"),
     video = document.querySelector("#video");
 
@@ -140,6 +99,10 @@ window.addEventListener('resize', function(e) {
   height = window.innerHeight;
   cv.width = tcv.width = width;
   cv.height = tcv.height = height;
+});
+
+video.addEventListener("ended", function(e) {
+  menuToggleVideo();
 });
 /*
 document.querySelector('#send-x-btn').addEventListener('mousedown', onMenuSendXCC);
@@ -225,6 +188,7 @@ function onKeyDown(event) {
 
     //TODO: add features here
     case 51:
+      menuToggleVideo();
       break;
 
     case 52:
@@ -380,6 +344,20 @@ function menuShowCamera() {
   */
 
   requestCamera();
+}
+
+function menuToggleVideo() {
+  if (cameraShown) {
+      cameraShown = false;
+      video.pause();
+      video.src = null; 
+    } else {
+      cameraShown = true;
+      video.volume = 0;
+      video.src = "video/video-"+videoCounter+".mp4";
+      video.play();
+      videoCounter = (++videoCounter)%videoAmount;
+    }
 }
 
 function menuChooseColor(col) {
