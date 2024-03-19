@@ -90,6 +90,7 @@ let cv = document.getElementById('drawCanvas'),
     dirty = false,
     tdirty = false,
     i,n,first,
+    baseLineWidth = 7,
     maxLineWidth = 10,
     saved = false,
     currentPalette,
@@ -281,7 +282,7 @@ function draw() {
     n = currentStroke.length;
     for(i = 1; i < n; ++i) {
       tctx.beginPath();
-      tctx.lineWidth = maxLineWidth * currentStroke[i-1][2];
+      tctx.lineWidth = baseLineWidth + maxLineWidth * currentStroke[i-1][2];
       tctx.moveTo(currentStroke[i-1][0], currentStroke[i-1][1]);
       tctx.lineTo(currentStroke[i][0]  , currentStroke[i][1]  );
       tctx.stroke();
