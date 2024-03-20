@@ -2,11 +2,13 @@
 REQUIREMENTS :
   - Brave (kiosk mode)
   - Node.js for server
-  - LoopMIDI
-  - Ableton Live (or granular synth)
+  - Bespoke Synth for granular synthesis
 */
 
-const palettes = [ 
+const palettes = [
+  '000000-000000-000000-000000-000000' //All black for pakito
+];
+/*
   '4f000b-720026-ce4257-ff7f51-ff9b54',
   '8e9aaf-cbc0d3-efd3d7-feeafa-dee2ff',
   '880d1e-dd2d4a-f26a8d-f49cbb-cbeef3',
@@ -34,7 +36,7 @@ const palettes = [
   'f7b267-f79d65-f4845f-f27059-f25c54',
   '5fad56-f2c14e-f78154-4d9078-b4436c'
 ];
-
+*/
 let cv = document.getElementById('drawCanvas'),
     ctx = cv.getContext('2d'),
     tcv = document.getElementById('tempCanvas'),
@@ -71,7 +73,7 @@ let cameraRequested = false,
     cameraShown = false,
     cameraStream = null,
     videoCounter = 0;
-    videoAmount = 5;
+    videoAmount = 7;
     camera_button = document.querySelector("#start-camera"),
     video = document.querySelector("#video");
 
@@ -102,7 +104,8 @@ window.addEventListener('resize', function(e) {
 });
 
 video.addEventListener("ended", function(e) {
-  menuToggleVideo();
+  //menuToggleVideo();
+  playNextVideo();
 });
 /*
 document.querySelector('#send-x-btn').addEventListener('mousedown', onMenuSendXCC);
@@ -183,7 +186,7 @@ function onKeyDown(event) {
       break;
 
     case 50:
-      menuFill();
+      //menuFill(); // disable fill for pakito
       break;
 
     //TODO: add features here
@@ -353,10 +356,7 @@ function menuToggleVideo() {
       video.src = null; 
     } else {
       cameraShown = true;
-      video.volume = 0;
-      video.src = "video/video-"+videoCounter+".mp4";
-      video.play();
-      videoCounter = (++videoCounter)%videoAmount;
+      playNextVideo();
     }
 }
 
@@ -416,6 +416,14 @@ function saveImage() {
   .then(response => {
     console.log("image saved : ", response);
   });
+}
+
+
+function playNextVideo() {
+  video.volume = 0;
+  video.src = "video/video-"+videoCounter+".mp4";
+  video.play();
+  videoCounter = (++videoCounter)%videoAmount;
 }
 
 function chooseRandomPalette() {
