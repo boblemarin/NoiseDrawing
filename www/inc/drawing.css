@@ -5,6 +5,10 @@ html, body { height: 100%; }
 
 body {
   background-color: #fff;
+  background-image: url(carton.jpg);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   margin: 0;
   color: black;
   font-family: Helvetica;
